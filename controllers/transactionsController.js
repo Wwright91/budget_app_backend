@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const transactionsArray = require("../models/transaction");
-const { nanoid } = require("nanoid")
+const { nanoid } = require("nanoid");
 
 router.get("/", (req, res) => {
   res.status(200).send(transactionsArray);
@@ -9,7 +9,8 @@ router.get("/", (req, res) => {
 
 const err = (id) => `Can not find transaction with id: ${id}!`;
 
-const getIndex = (id) => transactionsArray.findIndex(transaction => transaction.id === id)
+const getIndex = (id) =>
+  transactionsArray.findIndex((transaction) => transaction.id === id);
 
 router.get("/:id", (req, res) => {
   const { id } = req.params;
@@ -24,20 +25,31 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  const currentTransaction = { id: nanoid(2), ...req.body }
-  transactionsArray.push(currentTransaction)
-  res.status(201).send(transactionsArray[transactionsArray.length - 1])
-})
+  const currentTransaction = { id: nanoid(2), ...req.body };
+  transactionsArray.push(currentTransaction);
+  res.status(201).send(transactionsArray[transactionsArray.length - 1]);
+});
 
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  const deletedTransactionIndex = getIndex(id)
+  const deletedTransactionIndex = getIndex(id);
   if (deletedTransactionIndex !== -1) {
-    transactionsArray.splice(deletedTransactionIndex, 1)
-    res.redirect("/transactions")
+    transactionsArray.splice(deletedTransactionIndex, 1);
+    res.redirect("/transactions");
   } else {
-    res.status(404).json({error: err(id)})
+    res.status(404).json({ error: err(id) });
   }
-})
+});
+
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const transactionToUpdateIndex = getIndex(id);
+  if (transactionToUpdateIndex !== -1) {
+    transactionsArray[transactionToUpdateIndex] = req.body;
+    res.status(200).json(transactionsArray[transactionToUpdateIndex]);
+  } else {
+    res.status(404).json({ error: err(id) });
+  }
+});
 
 module.exports = router;
